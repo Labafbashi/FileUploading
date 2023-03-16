@@ -1,0 +1,15 @@
+# Visual Studio build directories
+bin/
+obj/
+.vs/
+
+# Compiled binary files
+binaries/
+
+# Node.js packages
+node_modules/
+
+# Temporary files
+*.log
+*.bak
+*.cache

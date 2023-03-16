@@ -1,0 +1,78 @@
+﻿@page "/record-table"
+
+@using System.Net.Http
+@using System.Threading.Tasks
+@inject HttpClient HttpClient
+
+<h1>Record Table</h1>
+
+@if (records != null)
+{
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Uploaded</th>
+                <th>File Name</th>
+                <th>Stored File Name</th>
+                <th>Error Code</th>
+                <th>File Type</th>
+                <th>Download</th>
+                <th>Delete</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var record in records)
+            {
+                <tr>
+                    <td>@record.id</td>
+                    <td>@record.Uploaded</td>
+                    <td>@record.FileName</td>
+                    <td>@record.StoredFileName</td>
+                    <td>@record.ErrorCode</td>
+                    <td>@record.FileType</td>
+                    <td><a href="@($"/Records/{record.id}")">@record.FileName</a></td>
+                    <td><button @onclick="() => DeleteFile(record.id)">Delete</button></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <p>@errorMSG</p>
+}
+else
+{
+    <p>Nothing find to show</p>
+}
+
+
+@code {
+    private List<UploadResult> records;
+    public string errorMSG="";
+
+    protected override async Task OnInitializedAsync()
+    {
+        records = await HttpClient.GetFromJsonAsync<List<UploadResult>>("/Records");
+
+    }
+
+    private async Task DeleteFile(int id)
+    {
+        var result = await HttpClient.DeleteAsync($"/filedelete/{id}");
+
+        if (result.IsSuccessStatusCode)
+        {
+            // Refresh the table to show the updated results
+            await OnInitializedAsync();
+            await OnParametersSetAsync();
+            StateHasChanged();
+            errorMSG = "Succeccfully delete.";
+        }
+        else
+        {
+            // Handle the error
+            // ...
+            errorMSG = "Something got wrong to delete the file. Please try again or contact with Administrator.";
+        }
+    }
+
+}
